@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pocketbase
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pocketbase
+  template:
+    metadata:
+      labels:
+        app: pocketbase
+    spec:
+      containers:
+        - name: pocketbase
+          image: pocketbase/pocketbase:latest  # Use the official PocketBase image
+          ports:
+            - containerPort: 8090  # Default port for PocketBase
+          volumeMounts:
+            - name: pocketbase-storage
+              mountPath: /pb_data  # Mount the volume to the container at /pb_data
+      volumes:
+        - name: pocketbase-storage
+          persistentVolumeClaim:
+            claimName: pocketbase-pvc  # Reference the PVC created below
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pocketbase-svc
+spec:
+  selector:
+    app: pocketbase
+  ports:
+    - protocol: TCP
+      port: 8090   # Service will be available on port 8090
+      targetPort: 8090  # The port the PocketBase container is listening on
+  type: LoadBalancer  # Expose the service through a load balancer if on a cloud provider
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pocketbase-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce  # The volume can only be mounted by a single node at a time
+  resources:
+    requests:
+      storage: 1Gi  # Request 1Gi of storage for PocketBase
