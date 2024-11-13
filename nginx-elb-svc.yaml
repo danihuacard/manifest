@@ -3,7 +3,7 @@ kind: Service
 metadata: 
   name: nginx
   annotations:
-    kubernetes.io/elb.id: 2383437f-a105-11ef-b0c7-0255ac100233    # Load balancer ID. Replace it with the actual value.
+    kubernetes.io/elb.id: 8c451291-0ed1-4370-8e15-897e93d7ac5b    # Load balancer ID. Replace it with the actual value.
     kubernetes.io/elb.class: performance                          # Load balancer type
     kubernetes.io/elb.lb-algorithm: ROUND_ROBIN                                    # Load balancer algorithm
     kubernetes.io/elb.session-affinity-mode: SOURCE_IP                             # The sticky session type is source IP address.
