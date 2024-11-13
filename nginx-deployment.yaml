@@ -13,7 +13,7 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx:alpine
+      - image: nginx 
         name: nginx
       imagePullSecrets:
       - name: default-secret
