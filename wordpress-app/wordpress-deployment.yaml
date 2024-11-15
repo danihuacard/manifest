@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        version: v1
+    spec:
+      containers:
+        - name: container-1
+          image: wordpress:latest
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: mysql:3306
+            - name: WORDPRESS_DB_USER
+              value: db_user
+            - name: WORDPRESS_DB_PASSWORD
+              value: psswrd
+            - name: WORDPRESS_DB_NAME
+              value: database
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - name: wordpress
+              readOnly: false
+              mountPath: /var/www/html
+      imagePullSecrets:
+        - name: default-secret
+      volumes:
+        - name: wordpress
+          persistentVolumeClaim:
+            claimName: wordpress
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress
+  namespace: default
+  annotations:
+    everest.io/disk-volume-type: SSD
+    everest.io/enterprise-project-id: '0'
+  labels:
+    failure-domain.beta.kubernetes.io/region: LA-Santiago  # Region where the EVS disk is in
+    failure-domain.beta.kubernetes.io/zone: AZ2   # AZ where the EVS disk is in. It must be the same as the AZ of the node that runs the workload.
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: csi-disk
